@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'ObrolIn' }}</title>
+    <title>{{ $title ?? 'OmongIn' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>[x-cloak]{display:none!important}</style>
 </head>
@@ -151,7 +151,7 @@
   <footer class="bg-white/60 backdrop-blur">
     <div class="h-1 w-full bg-gradient-to-r from-sky-500 via-indigo-500 to-fuchsia-500"></div>
     <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
-      <p>© {{ date('Y') }} ObrolIn</p>
+      <p>© {{ date('Y') }} OmongIn</p>
       <p>
         <span class="text-slate-400">Made with ❤️ by</span>
         <span class="font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-fuchsia-600">Oqexip</span>

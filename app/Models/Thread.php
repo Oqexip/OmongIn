@@ -38,30 +38,12 @@ class Thread extends Model
     ];
 
     // ===== Relasi =====
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-    public function anon()
-    {
-        return $this->belongsTo(AnonSession::class, 'anon_session_id');
-    }
-    public function board()
-    {
-        return $this->belongsTo(Board::class);
-    }
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
-    }
-    public function votes()
-    {
-        return $this->morphMany(Vote::class, 'votable');
-    }
-    public function attachments()
-    {
-        return $this->morphMany(Attachment::class, 'attachable');
-    }
+    public function user() { return $this->belongsTo(User::class); }
+    public function anon() { return $this->belongsTo(AnonSession::class, 'anon_session_id'); }
+    public function board() { return $this->belongsTo(Board::class); }
+    public function comments() { return $this->hasMany(Comment::class); }
+    public function votes() { return $this->morphMany(Vote::class, 'votable'); }
+    public function attachments() { return $this->morphMany(Attachment::class, 'attachable'); }
 
     // ===== Ownership & izin edit =====
     public function isOwnedByRequest(Request $request): bool
@@ -78,11 +60,7 @@ class Thread extends Model
         return $this->created_at && $this->created_at->gt(now()->subMinutes(15));
     }
 
-    public function threads()
-    {
-        return $this->hasMany(Thread::class);
-    }
-
+    public function threads() { return $this->hasMany(Thread::class); }
 
     // ===== Voting & skor =====
     public function recalcScore(): void
@@ -91,11 +69,7 @@ class Thread extends Model
         $this->saveQuietly();
     }
 
-    // ===== Pencarian =====
-
-    /**
-     * Deteksi dukungan FULLTEXT (MySQL).
-     */
+    // ===== Pencarian (dipertahankan) =====
     public static function supportsFullText(): bool
     {
         $connection = config('database.default');
@@ -103,18 +77,12 @@ class Thread extends Model
         return $driver === 'mysql';
     }
 
-    /**
-     * Scope pencarian:
-     * - MySQL FULLTEXT pada (title, content) dalam BOOLEAN MODE.
-     * - Fallback LIKE jika bukan MySQL / index belum ada.
-     */
     public function scopeSearch($query, string $q)
     {
         $q = trim($q);
         if ($q === '') return $query;
 
         if (self::supportsFullText()) {
-            // sanit sederhana untuk boolean mode
             $term = preg_replace('/[^\p{L}\p{N}\s\+\-\*\~\"\(\)]/u', ' ', $q);
 
             return $query
@@ -122,24 +90,52 @@ class Thread extends Model
                 ->orderByRaw("MATCH(title, content) AGAINST (? IN BOOLEAN MODE) DESC", [$term . '*']);
         }
 
-        // Escape % dan _ pada LIKE
         $like = '%' . addcslashes($q, '%_') . '%';
 
         return $query->where(function ($w) use ($like) {
             $w->where('title', 'like', $like)
-                ->orWhere('content', 'like', $like);
+              ->orWhere('content', 'like', $like);
         });
     }
 
-    // ===== (Opsional) Helper ringkasan untuk view =====
     public function getExcerptAttribute(): string
     {
         $plain = trim(strip_tags((string) $this->content));
         return str($plain)->limit(160)->toString();
     }
 
-    public function category()
+    public function category() { return $this->belongsTo(Category::class); }
+
+    /**
+     * Tambahkan kolom virtual 'user_vote' pada hasil query.
+     * - Jika login → filter user_id
+     * - Jika anonim → filter anon_session_id
+     * - Jika keduanya null → subquery tidak mengembalikan baris (NULL)
+     *
+     * NOTE: sesuaikan nilai votable_type di bawah dengan yang kamu simpan di tabel votes.
+     * Jika kamu menyimpan class name, ganti 'thread' menjadi Thread::class.
+     */
+    public function scopeWithUserVote($query, ?int $userId, ?int $anonSessionId, string $votableType = 'thread')
     {
-        return $this->belongsTo(Category::class);
+        return $query
+            ->select('threads.*')
+            ->selectSub(function ($q) use ($userId, $anonSessionId, $votableType) {
+                $q->from('votes')
+                  ->select('value')
+                  ->whereColumn('votes.votable_id', 'threads.id')
+                  ->where('votes.votable_type', $votableType);
+
+                if ($userId) {
+                    $q->where('user_id', $userId);
+                } elseif ($anonSessionId) {
+                    // ← perbaikan utama: pakai anon_session_id, BUKAN anon_id
+                    $q->where('anon_session_id', $anonSessionId);
+                } else {
+                    // supaya pasti NULL ketika tidak ada identitas
+                    $q->whereRaw('1 = 0');
+                }
+
+                $q->limit(1);
+            }, 'user_vote');
     }
 }

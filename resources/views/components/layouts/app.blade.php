@@ -1,21 +1,21 @@
 <!doctype html>
 <html lang="id" class="h-full">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'ObrolIn' }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        [x-cloak] {
-            display: none !important
-        }
+    
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <title>{{ $title ?? 'OmongIn' }}</title>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <style>
+            [x-cloak] {
+                display: none !important
+            }
     </style>
 </head>
 
 <body class="min-h-full bg-gradient-to-br from-slate-50 via-white to-slate-50 text-gray-900 antialiased">
-
+    
     {{-- ===== NAVBAR ===== --}}
     <header class="sticky top-0 z-40 border-b border-white/40 bg-white/70 backdrop-blur">
         <div class="max-w-6xl mx-auto px-4">
@@ -166,7 +166,7 @@
         <div class="h-1 w-full bg-gradient-to-r from-sky-500 via-indigo-500 to-fuchsia-500"></div>
         <div
             class="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p>© {{ date('Y') }} ObrolIn</p>
+            <p>© {{ date('Y') }} OmongIn</p>
             <p>
                 <span class="text-slate-400">Made with ❤️ by</span>
                 <span
