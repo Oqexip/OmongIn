@@ -13,20 +13,18 @@ class PopularController extends Controller
         $days = (int) $request->query('t', 30);
         $days = max(1, min(365, $days));
 
-        $userId         = auth()->id(); // jika login
-        $anonSessionId  = (int) ($request->attributes->get('anon_id') ?? session('anon_id')); // kalau anonim
+        $userId   = auth()->id();
+$anonKey  = $userId ? null : (string)(session('anon_key') ?? session('anon_id') ?? session('anon_session_id'));
 
-        // formula ranking
-        $popularityExpr = '(threads.score * 2 + threads.comment_count)';
+$threads = Thread::query()
+    ->where('created_at', '>=', now()->subDays($days))
+    ->with(['board','attachments'])
+    ->withUserVote($userId, $anonKey)
+    ->orderByRaw('(threads.score * 2 + threads.comment_count) DESC')
+    ->orderByDesc('created_at')
+    ->paginate(20)
+    ->withQueryString();
 
-        $threads = Thread::query()
-            ->where('created_at', '>=', now()->subDays($days))
-            ->with(['board', 'attachments'])
-            ->withUserVote($userId, $anonSessionId, 'thread') // ← 'thread' harus sama seperti saat menyimpan votes
-            ->orderByRaw("$popularityExpr DESC")
-            ->orderByDesc('created_at')
-            ->paginate(20)
-            ->withQueryString();
 
         $boards = Board::query()->orderBy('name')->get();
 

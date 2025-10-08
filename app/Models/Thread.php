@@ -115,27 +115,20 @@ class Thread extends Model
      * NOTE: sesuaikan nilai votable_type di bawah dengan yang kamu simpan di tabel votes.
      * Jika kamu menyimpan class name, ganti 'thread' menjadi Thread::class.
      */
-    public function scopeWithUserVote($query, ?int $userId, ?int $anonSessionId, string $votableType = 'thread')
-    {
-        return $query
-            ->select('threads.*')
-            ->selectSub(function ($q) use ($userId, $anonSessionId, $votableType) {
-                $q->from('votes')
-                  ->select('value')
-                  ->whereColumn('votes.votable_id', 'threads.id')
-                  ->where('votes.votable_type', $votableType);
+public function scopeWithUserVote($query, ?int $userId, ?string $anonKey)
+{
+    // IMPORTANT: votable_type di DB kamu = FQCN (App\Models\Thread) → pakai itu
+    $type = self::class;
 
-                if ($userId) {
-                    $q->where('user_id', $userId);
-                } elseif ($anonSessionId) {
-                    // ← perbaikan utama: pakai anon_session_id, BUKAN anon_id
-                    $q->where('anon_session_id', $anonSessionId);
-                } else {
-                    // supaya pasti NULL ketika tidak ada identitas
-                    $q->whereRaw('1 = 0');
-                }
+    return $query->select('threads.*')->selectSub(function ($q) use ($userId, $anonKey, $type) {
+        $q->from('votes')
+          ->select('value')
+          ->whereColumn('votes.votable_id', 'threads.id')
+          ->where('votes.votable_type', $type)
+          ->when($userId,  fn ($qq) => $qq->where('user_id', $userId))
+          ->when(!$userId, fn ($qq) => $qq->where('anon_key', $anonKey))
+          ->limit(1);
+    }, 'user_vote');
+}
 
-                $q->limit(1);
-            }, 'user_vote');
-    }
 }

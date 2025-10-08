@@ -168,7 +168,7 @@
             class="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
             <p>© {{ date('Y') }} OmongIn</p>
             <p>
-                <span class="text-slate-400">Made with ❤️ by</span>
+                <span class="text-slate-400">Made by</span>
                 <span
                     class="font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-fuchsia-600">Oqexip</span>
             </p>
