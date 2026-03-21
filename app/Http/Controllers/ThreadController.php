@@ -90,8 +90,9 @@ class ThreadController extends Controller
                 'integer',
                 Rule::exists('categories', 'id')->where('board_id', $board->id),
             ],
-            'images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
-            'is_nsfw'  => ['nullable', 'boolean'],
+            'images.*'   => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
+            'is_nsfw'    => ['nullable', 'boolean'],
+            'is_spoiler' => ['nullable', 'boolean'],
         ]);
 
         $thread = Thread::create([
@@ -102,6 +103,7 @@ class ThreadController extends Controller
             'title'           => $data['title'] ?? null,
             'content'         => $data['content'],
             'is_nsfw'         => $request->boolean('is_nsfw'),
+            'is_spoiler'      => $request->boolean('is_spoiler'),
         ]);
 
         if ($request->hasFile('images')) {

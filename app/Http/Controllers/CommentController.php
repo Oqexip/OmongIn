@@ -22,8 +22,9 @@ class CommentController extends Controller
         $data = $request->validate([
             'content'   => ['required', 'string', 'min:1', 'max:5000'],
             'parent_id' => ['nullable', 'exists:comments,id'],
-            'images.*'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
-            'is_nsfw'   => ['nullable', 'boolean'],
+            'images.*'   => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
+            'is_nsfw'    => ['nullable', 'boolean'],
+            'is_spoiler' => ['nullable', 'boolean'],
         ]);
 
         $depth = 0;
@@ -47,6 +48,7 @@ class CommentController extends Controller
                 'depth'           => $depth,
                 'content'         => $data['content'],
                 'is_nsfw'         => $request->boolean('is_nsfw'),
+                'is_spoiler'      => $request->boolean('is_spoiler'),
             ]);
 
             if ($request->hasFile('images')) {

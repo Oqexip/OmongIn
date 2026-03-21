@@ -25,11 +25,13 @@ class Comment extends Model
         'depth',
         'content',
         'is_nsfw',
+        'is_spoiler',
     ];
 
     protected $casts = [
-        'edited_at' => 'datetime',
-        'is_nsfw'   => 'boolean',
+        'edited_at'  => 'datetime',
+        'is_nsfw'    => 'boolean',
+        'is_spoiler' => 'boolean',
     ];
 
     // === Relationships ===

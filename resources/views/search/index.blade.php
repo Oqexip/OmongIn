@@ -87,7 +87,7 @@
                                         <div>
                                             <div class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
                                                 <span class="transition group-hover:underline underline-offset-4 decoration-2 decoration-neutral-400 dark:decoration-neutral-500">
-                                                    {{ $t->title ?? Str::limit(strip_tags($t->content), 80) }}
+                                                    {{ $t->title ?? \App\Support\Sanitize::excerpt($t->content, 80) }}
                                                 </span>
                                             </div>
                                             @if ($t->category)
@@ -104,7 +104,7 @@
                                     </div>
 
                                     <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
-                                        {{ Str::limit(strip_tags($t->content), 200) }}
+                                        {{ \App\Support\Sanitize::excerpt($t->content, 200) }}
                                     </p>
 
                                     <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-4 flex-wrap">
@@ -152,7 +152,7 @@
                                             </div>
 
                                             <p class="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
-                                                {{ Str::limit(strip_tags($c->content), 200) }}
+                                                {{ \App\Support\Sanitize::excerpt($c->content, 200) }}
                                             </p>
                                         </div>
                                         @if ($c->thread && $c->thread->board)

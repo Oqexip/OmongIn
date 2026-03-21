@@ -20,4 +20,16 @@ class Sanitize
 
         return $html;
     }
+
+    public static function excerpt(?string $input, int $limit = 240): string
+    {
+        if (!$input) {
+            return '';
+        }
+
+        // Hide spoiler text
+        $noSpoilers = preg_replace('/\|\|.*?\|\|/s', '[SPOILER]', $input);
+
+        return Str::limit(strip_tags($noSpoilers), $limit);
+    }
 }

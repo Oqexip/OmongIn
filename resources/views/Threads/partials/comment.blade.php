@@ -37,6 +37,11 @@
                             NSFW
                         </span>
                     @endif
+                    @if($c->is_spoiler)
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border border-neutral-500 text-neutral-600 dark:border-neutral-400 dark:text-neutral-400">
+                            SPOILER
+                        </span>
+                    @endif
 
                     <span aria-hidden="true" class="text-neutral-300 dark:text-neutral-600">•</span>
                     <time datetime="{{ $c->created_at->toIso8601String() }}">{{ $createdHuman }}</time>
@@ -103,18 +108,18 @@
             <div class="mt-3 grid grid-cols-2 gap-2">
                 @foreach ($c->attachments as $a)
                     @php $url = Storage::url($a->path); @endphp
-                    <div x-data="{ revealed: {{ $c->is_nsfw ? 'false' : 'true' }} }" class="relative aspect-[4/3] bg-neutral-100 dark:bg-neutral-900 rounded-md overflow-hidden border border-neutral-100 dark:border-neutral-800">
+                    <div x-data="{ revealed: {{ ($c->is_nsfw || $c->is_spoiler) ? 'false' : 'true' }} }" class="relative aspect-[4/3] bg-neutral-100 dark:bg-neutral-900 rounded-md overflow-hidden border border-neutral-100 dark:border-neutral-800">
                         <a href="{{ $url }}" target="_blank" class="absolute inset-0 z-10 block" x-show="revealed">
                             <img src="{{ $url }}" alt="Attachment" class="w-full h-full object-cover hover:opacity-90 transition" loading="lazy">
                         </a>
 
-                        @if($c->is_nsfw)
+                        @if($c->is_nsfw || $c->is_spoiler)
                             <button type="button" @click="revealed = true" x-show="!revealed"
                                     class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-neutral-900 text-white cursor-pointer hover:bg-black transition p-2 text-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                                 </svg>
-                                <span class="font-bold text-xs">NSFW</span>
+                                <span class="font-bold text-xs">{{ $c->is_spoiler ? 'SPOILER' : 'NSFW' }}</span>
                             </button>
                         @endif
                     </div>
@@ -191,18 +196,32 @@
                             </div>
 
                             <div class="flex items-center justify-between pt-2">
-                                <label class="flex items-center gap-2 cursor-pointer group">
-                                    <div class="relative flex items-center">
-                                        <input type="checkbox" name="is_nsfw" value="1"
-                                            class="peer appearance-none w-5 h-5 border-2 border-neutral-300 dark:border-neutral-600 rounded bg-white dark:bg-neutral-800 checked:bg-black checked:border-black dark:checked:bg-white dark:checked:border-white transition-all cursor-pointer">
-                                        <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white dark:text-black opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                    </div>
-                                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-colors">
-                                        NSFW
-                                    </span>
-                                </label>
+                                <div class="flex items-center gap-4">
+                                    <label class="flex items-center gap-2 cursor-pointer group">
+                                        <div class="relative flex items-center">
+                                            <input type="checkbox" name="is_spoiler" value="1"
+                                                class="peer appearance-none w-5 h-5 border-2 border-neutral-300 dark:border-neutral-600 rounded bg-white dark:bg-neutral-800 checked:bg-black checked:border-black dark:checked:bg-white dark:checked:border-white transition-all cursor-pointer">
+                                            <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white dark:text-black opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                        </div>
+                                        <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-colors">
+                                            Spoiler
+                                        </span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer group">
+                                        <div class="relative flex items-center">
+                                            <input type="checkbox" name="is_nsfw" value="1"
+                                                class="peer appearance-none w-5 h-5 border-2 border-neutral-300 dark:border-neutral-600 rounded bg-white dark:bg-neutral-800 checked:bg-black checked:border-black dark:checked:bg-white dark:checked:border-white transition-all cursor-pointer">
+                                            <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white dark:text-black opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                        </div>
+                                        <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-colors">
+                                            NSFW
+                                        </span>
+                                    </label>
+                                </div>
 
                                 <div class="flex items-center gap-2">
                                     <button type="button"

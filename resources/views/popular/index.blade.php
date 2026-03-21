@@ -63,7 +63,7 @@
                         @foreach ($threads as $thread)
                             @php
                                 $title       = $thread->title ?? '(untitled)';
-                                $excerpt     = Str::limit(strip_tags($thread->content), 240);
+                                $excerpt     = \App\Support\Sanitize::excerpt($thread->content, 240);
                                 $userVote    = (int) ($thread->user_vote ?? 0);
                                 $firstAttach = $thread->attachments->first();
                                 $imgUrl      = $firstAttach ? Storage::url($firstAttach->path) : null;
@@ -107,11 +107,23 @@
                                        focus:outline-none focus:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600"
                             >
                                 {{-- Title --}}
-                                <a href="{{ $threadUrl }}"
-                                   @click.stop
-                                   class="block text-xl font-bold text-neutral-900 dark:text-white hover:underline underline-offset-4 decoration-2">
-                                    {{ $title }}
-                                </a>
+                                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                    <a href="{{ $threadUrl }}"
+                                       @click.stop
+                                       class="block text-xl font-bold text-neutral-900 dark:text-white hover:underline underline-offset-4 decoration-2">
+                                        {{ $title }}
+                                    </a>
+                                    @if($thread->is_nsfw)
+                                        <span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-2 py-1 text-xs font-semibold text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                                            NSFW
+                                        </span>
+                                    @endif
+                                    @if($thread->is_spoiler)
+                                        <span class="inline-flex items-center rounded-md bg-neutral-50 dark:bg-neutral-900/30 px-2 py-1 text-xs font-semibold text-neutral-700 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-800">
+                                            SPOILER
+                                        </span>
+                                    @endif
+                                </div>
 
                                 {{-- Meta --}}
                                 <div class="mt-1.5 flex items-center gap-2 text-sm">
@@ -125,8 +137,22 @@
                                 @endif
 
                                 @if ($imgUrl)
-                                    <img src="{{ $imgUrl }}" alt="Image of {{ $title }}"
-                                         class="mt-3 rounded-xl w-full max-h-[520px] object-cover border border-neutral-100 dark:border-neutral-800">
+                                    <div x-data="{ revealed: {{ ($thread->is_nsfw || $thread->is_spoiler) ? 'false' : 'true' }} }" class="relative mt-3 rounded-xl overflow-hidden border border-neutral-100 dark:border-neutral-800 max-h-[520px]">
+                                        <div x-show="revealed">
+                                            <img src="{{ $imgUrl }}" alt="Image of {{ $title }}"
+                                                 class="w-full h-full object-cover">
+                                        </div>
+                                        @if($thread->is_nsfw || $thread->is_spoiler)
+                                            <button type="button" @click.stop="revealed = true" x-show="!revealed"
+                                                    class="absolute inset-0 z-20 w-full h-full min-h-[200px] flex flex-col items-center justify-center bg-neutral-900 text-white cursor-pointer hover:bg-black transition p-4 text-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                                </svg>
+                                                <span class="font-bold text-sm">{{ $thread->is_spoiler ? 'Spoiler Content' : 'NSFW Content' }}</span>
+                                                <span class="text-xs opacity-70 mt-1">Click to reveal</span>
+                                            </button>
+                                        @endif
+                                    </div>
                                 @endif
 
                                 {{-- Actions --}}
