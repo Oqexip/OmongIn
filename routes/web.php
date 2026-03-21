@@ -5,6 +5,7 @@ use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\VoteController;
+use App\Http\Controllers\SearchController;
 use App\Models\Board;
 use App\Http\Controllers\PopularController;
 
@@ -18,6 +19,9 @@ Route::middleware('anon')->group(function () {
     Route::get('/', function () {
         return view('home', ['boards' => Board::all()]);
     })->name('home');
+
+    // Global Search
+    Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
     // Boards & Threads
     Route::get('/b/{board:slug}', [ThreadController::class, 'index'])->name('boards.show');

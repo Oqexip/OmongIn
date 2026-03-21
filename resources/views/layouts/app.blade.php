@@ -55,6 +55,15 @@
                     {{ request()->routeIs('popular.*') ? 'text-black dark:text-white border-black dark:border-white' : 'text-neutral-500 dark:text-neutral-400 border-transparent hover:text-black dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-600' }}">
             Popular
           </a>
+          <a href="{{ route('search.index') }}"
+             class="inline-flex items-center text-sm font-medium px-1 pb-2 border-b-2 transition
+                    {{ request()->routeIs('search.*') ? 'text-black dark:text-white border-black dark:border-white' : 'text-neutral-500 dark:text-neutral-400 border-transparent hover:text-black dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-600' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="7" stroke-width="1.6" />
+              <path d="M20 20l-3.5-3.5" stroke-width="1.6" />
+            </svg>
+            Search
+          </a>
         </nav>
 
         {{-- Kanan: Auth + Dark toggle --}}
@@ -149,10 +158,26 @@
           </a>
           <a href="{{ route('popular.index') }}"
              class="block px-3 h-10 leading-10 rounded-xl border border-neutral-200 dark:border-neutral-700
-                    bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-sm shadow-sm mb-3 text-center
+                    bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-sm shadow-sm mb-2 text-center
                     {{ request()->routeIs('popular.*') ? 'text-black dark:text-white font-semibold' : 'text-neutral-600 dark:text-neutral-400' }}">
             Popular
           </a>
+
+          {{-- Search (mobile) --}}
+          <form action="{{ route('search.index') }}" method="GET" class="mb-3">
+            <div class="relative">
+              <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari..."
+                     class="w-full h-10 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800
+                            px-3 pr-10 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+                            outline-none focus:border-neutral-500 dark:focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 shadow-sm" />
+              <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Cari">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-neutral-500 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="7" stroke-width="1.6" />
+                  <path d="M20 20l-3.5-3.5" stroke-width="1.6" />
+                </svg>
+              </button>
+            </div>
+          </form>
 
           {{-- Auth --}}
           @auth
