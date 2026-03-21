@@ -40,11 +40,11 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+            <a class="underline hover:no-underline text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 focus:ring-black dark:focus:ring-white transition-colors" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
             </a>
 
-            <x-primary-button class="ms-4 bg-gradient-to-r from-sky-600 to-fuchsia-600">
+            <x-primary-button class="ms-4">
                 {{ __('Register') }}
             </x-primary-button>
         </div>

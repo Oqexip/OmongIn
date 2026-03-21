@@ -27,19 +27,19 @@
         <!-- Remember Me -->
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                <input id="remember_me" type="checkbox" class="rounded border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-black dark:text-white shadow-sm focus:ring-black dark:focus:ring-white" name="remember">
+                <span class="ms-2 text-sm text-neutral-600 dark:text-neutral-400">{{ __('Remember me') }}</span>
             </label>
         </div>
 
         <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
-                <p class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                <a class="underline hover:no-underline text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 focus:ring-black dark:focus:ring-white transition-colors" href="{{ route('password.request') }}">
                     {{ __('Forgot your password?') }}
-                </p>{{-- ubah tagnya menjadi a dari p jika ingin mendevelop forgot password --}}
+                </a>
             @endif
 
-            <x-primary-button class="ms-3 bg-gradient-to-r from-sky-600 to-fuchsia-600">
+            <x-primary-button class="ms-3">
                 {{ __('Log in') }}
             </x-primary-button>
         </div>

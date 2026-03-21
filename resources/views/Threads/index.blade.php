@@ -32,7 +32,7 @@
                         class="space-y-4">
                         @csrf
 
-                        <input name="title" placeholder="Judul"
+                        <input name="title" placeholder="Judul" required
                             class="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3.5 py-2.5 text-[15px]
                                text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 shadow-sm
                                focus:outline-none focus:border-neutral-500 dark:focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700" />

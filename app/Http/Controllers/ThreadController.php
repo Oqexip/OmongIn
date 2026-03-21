@@ -68,7 +68,7 @@ class ThreadController extends Controller
     public function store(Request $request, Board $board)
     {
         $data = $request->validate([
-            'title'       => ['nullable', 'string', 'max:140'],
+            'title'       => ['required', 'string', 'max:140'],
             'content'     => ['required', 'string', 'min:3', 'max:10000'],
             'category_id' => [
                 'nullable',
@@ -106,7 +106,7 @@ class ThreadController extends Controller
         }
 
         $data = $request->validate([
-            'title'   => ['nullable', 'string', 'max:140'],
+            'title'   => ['required', 'string', 'max:140'],
             'content' => ['required', 'string', 'min:3', 'max:10000'],
         ]);
 

@@ -3,7 +3,7 @@
     use Illuminate\Support\Str;
     use Illuminate\Support\Facades\Storage;
 
-    $presets = [1 => '24h', 7 => '7d', 30 => '30d', 90 => '90d'];
+    $presets = [1 => '24h', 7 => '7d', 30 => '30d', 90 => '90d', 'all' => 'All Time'];
 @endphp
 
 <x-app-layout title="Popular Threads">
@@ -46,7 +46,7 @@
                     @foreach ($presets as $d => $label)
                         <a href="{{ route('popular.index', ['t' => $d]) }}"
                            class="inline-flex items-center px-4 h-9 rounded-full text-sm font-medium transition-all
-                                  {{ $days == $d
+                                  {{ (string)$days === (string)$d
                                       ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm'
                                       : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500' }}">
                             {{ $label }}
