@@ -5,50 +5,36 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* ── Dark-mode variant (class strategy) ── */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
 }
 
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
-
 /* resources/css/app.css */
 @layer components {
     .hover-card {
-        @apply relative rounded-2xl border border-slate-200 bg-white/80 backdrop-blur
+        @apply relative rounded-2xl border border-neutral-200 bg-white
            shadow-sm transition-all duration-300 ease-out;
-
-        /* posisi stacking konten di atas overlay */
         z-index: 0;
     }
 
-    /* Overlay gradient halus (soft tint) */
-    .hover-card::before {
-        content: "";
-        @apply absolute inset-0 rounded-2xl pointer-events-none opacity-0 transition-opacity duration-300;
-        background: linear-gradient(
-            135deg,
-            rgba(14, 165, 233, 0.25),
-            /* sky-500 → lebih tebal */ rgba(217, 70, 239, 0.25)
-                /* fuchsia-500 → lebih tebal */
-        );
-        z-index: -1;
+    .dark .hover-card {
+        @apply border-neutral-800 bg-neutral-900;
     }
 
-    /* Efek lift + glow saat hover/fokus */
+    /* Efek lift saat hover/fokus */
     .hover-card:hover,
     .hover-card:focus-within {
-        @apply -translate-y-0.5 shadow-lg ring-1 ring-slate-200/70;
-        /* opsional: buat sedikit lebih terang */
-        background-color: rgb(255 255 255 / 0.9);
+        @apply -translate-y-0.5 shadow-lg border-neutral-400;
     }
 
-    .hover-card:hover::before,
-    .hover-card:focus-within::before {
-        @apply opacity-100;
+    .dark .hover-card:hover,
+    .dark .hover-card:focus-within {
+        @apply border-neutral-600 shadow-neutral-900/50;
     }
 }
 
@@ -57,7 +43,9 @@
     .hover-card {
         transition: none;
     }
-    .hover-card::before {
-        transition: none;
-    }
+}
+
+/* Smooth theme transition */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
 }

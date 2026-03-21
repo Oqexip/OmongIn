@@ -37,14 +37,14 @@
             'h-8 w-8 rounded-full flex items-center justify-center border border-black/5 dark:border-white/10',
             loading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
             myVote === 1
-                ? 'bg-emerald-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-200 dark:hover:bg-white/20'
+                ? 'bg-black text-white dark:bg-white dark:text-black'
+                : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
         ]"
         title="Upvote"
         aria-label="Upvote"
     >▲</button>
 
-    <span class="min-w-[2.5rem] text-center font-semibold" x-text="score"></span>
+    <span class="min-w-[2.5rem] text-center font-bold text-neutral-800 dark:text-neutral-200" x-text="score"></span>
 
     <button
         type="button"
@@ -55,8 +55,8 @@
             'h-8 w-8 rounded-full flex items-center justify-center border border-black/5 dark:border-white/10',
             loading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
             myVote === -1
-                ? 'bg-rose-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-200 dark:hover:bg-white/20'
+                ? 'bg-black text-white dark:bg-white dark:text-black'
+                : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
         ]"
         title="Downvote"
         aria-label="Downvote"
