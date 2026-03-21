@@ -24,10 +24,12 @@ class Comment extends Model
         'user_id',
         'depth',
         'content',
+        'is_nsfw',
     ];
 
     protected $casts = [
         'edited_at' => 'datetime',
+        'is_nsfw'   => 'boolean',
     ];
 
     // === Relationships ===

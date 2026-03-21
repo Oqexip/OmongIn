@@ -26,6 +26,7 @@ class Thread extends Model
         'edited_at',
         'score',
         'is_pinned',
+        'is_nsfw',
     ];
 
     protected $casts = [
@@ -35,6 +36,7 @@ class Thread extends Model
         'score'           => 'integer',
         'comment_count'   => 'integer',
         'is_pinned'       => 'boolean',
+        'is_nsfw'         => 'boolean',
         'edited_at'       => 'datetime',
         'created_at'      => 'datetime',
         'updated_at'      => 'datetime',

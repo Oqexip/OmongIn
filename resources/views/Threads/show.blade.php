@@ -35,8 +35,13 @@
         {{-- HEADER --}}
         <header class="mb-4 flex items-start justify-between gap-4">
             <div class="space-y-1">
-                <h1 class="text-2xl font-bold tracking-tight text-black dark:text-white">
+                <h1 class="text-2xl font-bold tracking-tight text-black dark:text-white flex items-center gap-2">
                     {{ $thread->title ?? 'Thread' }}
+                    @if($thread->is_nsfw)
+                        <span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-2 py-1 text-xs font-semibold text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                            NSFW
+                        </span>
+                    @endif
                 </h1>
                 <div class="text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-2">
                     @if ($isAuthUser)
@@ -113,13 +118,28 @@
                 {!! \App\Support\Sanitize::toHtml($thread->content) !!}
             </div>
 
-            @if ($thread->attachments->isNotEmpty())
-                <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    @foreach ($thread->attachments as $a)
-                        <a href="{{ Storage::url($a->path) }}" target="_blank" class="block">
-                            <img src="{{ Storage::url($a->path) }}"
-                                 class="rounded-xl object-cover w-full max-h-64 shadow border border-neutral-100 dark:border-neutral-800" loading="lazy" alt="">
-                        </a>
+            @if ($thread->attachments->count() > 0)
+                <div class="mt-6 mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    @foreach ($thread->attachments as $attachment)
+                        <div x-data="{ revealed: {{ $thread->is_nsfw ? 'false' : 'true' }} }" class="relative aspect-square bg-neutral-100 dark:bg-neutral-900 rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
+                            <a href="{{ Storage::url($attachment->path) }}" target="_blank"
+                               class="absolute inset-0 z-10 block"
+                               x-show="revealed">
+                                <img src="{{ Storage::url($attachment->path) }}" alt="Attachment"
+                                     class="w-full h-full object-cover hover:opacity-90 transition" loading="lazy">
+                            </a>
+
+                            @if($thread->is_nsfw)
+                                <button type="button" @click="revealed = true" x-show="!revealed"
+                                        class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-neutral-900 text-white cursor-pointer hover:bg-black transition p-4 text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                    </svg>
+                                    <span class="font-bold text-sm">NSFW Content</span>
+                                    <span class="text-xs opacity-70 mt-1">Click to reveal</span>
+                                </button>
+                            @endif
+                        </div>
                     @endforeach
                 </div>
             @endif
@@ -185,10 +205,37 @@
                             Clear
                         </button>
                     </div>
-                    <button type="submit"
-                            class="px-5 h-10 rounded-xl text-white bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 shadow-sm font-medium">
-                        Comment
-                    </button>
+                    <!-- Buttons & Options -->
+                    <div class="flex items-center justify-between mt-3">
+                        <label class="flex items-center justify-center w-11 h-11 rounded-full cursor-pointer text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                            <input type="file" name="images[]" multiple accept="image/*" class="hidden" x-ref="fileInput" @change="handleFiles">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </label>
+
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer group hidden sm:flex">
+                                <div class="relative flex items-center">
+                                    <input type="checkbox" name="is_nsfw" value="1"
+                                        class="peer appearance-none w-5 h-5 border-2 border-neutral-300 dark:border-neutral-600 rounded bg-white dark:bg-neutral-800 checked:bg-black checked:border-black dark:checked:bg-white dark:checked:border-white transition-all cursor-pointer">
+                                    <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white dark:text-black opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </div>
+                                <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-colors">
+                                    Tandai sbg NSFW
+                                </span>
+                            </label>
+
+                            <button type="submit"
+                                class="h-11 px-6 bg-black text-white rounded-xl shadow-sm font-medium hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition"
+                                :disabled="uploading"
+                                :class="{'opacity-75 cursor-wait': uploading}">
+                                Post Komentar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </section>

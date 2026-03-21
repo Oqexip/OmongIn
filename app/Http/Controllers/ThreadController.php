@@ -91,6 +91,7 @@ class ThreadController extends Controller
                 Rule::exists('categories', 'id')->where('board_id', $board->id),
             ],
             'images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
+            'is_nsfw'  => ['nullable', 'boolean'],
         ]);
 
         $thread = Thread::create([
@@ -100,6 +101,7 @@ class ThreadController extends Controller
             'user_id'         => Auth::id(),
             'title'           => $data['title'] ?? null,
             'content'         => $data['content'],
+            'is_nsfw'         => $request->boolean('is_nsfw'),
         ]);
 
         if ($request->hasFile('images')) {

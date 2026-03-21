@@ -15,31 +15,38 @@ class CommentController extends Controller
      */
     public function store(Request $request, Thread $thread)
     {
-        $data = $request->validate([
-            'content'   => ['required', 'string', 'min:1', 'max:10000'],
-            'parent_id' => ['nullable', 'integer', 'exists:comments,id'],
-            'images.*'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
-        ]);
-
-        $parentId = $data['parent_id'] ?? null;
-        $parent   = null;
-
-        if ($parentId) {
-            $parent = Comment::whereKey($parentId)
-                ->where('thread_id', $thread->id)
-                ->firstOrFail();
+        if ($thread->is_locked) {
+            abort(403, 'Thread is locked.');
         }
 
-        $depth = $parent ? ($parent->depth + 1) : 0;
+        $data = $request->validate([
+            'content'   => ['required', 'string', 'min:1', 'max:5000'],
+            'parent_id' => ['nullable', 'exists:comments,id'],
+            'images.*'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
+            'is_nsfw'   => ['nullable', 'boolean'],
+        ]);
 
-        DB::transaction(function () use ($request, $thread, $data, $parentId, $depth) {
+        $depth = 0;
+        if (!empty($data['parent_id'])) {
+            $parent = Comment::findOrFail($data['parent_id']);
+            if ($parent->thread_id !== $thread->id) {
+                abort(400, 'Invalid parent comment.');
+            }
+            if ($parent->depth >= 5) {
+                abort(400, 'Reply depth limit reached.');
+            }
+            $depth = $parent->depth + 1;
+        }
+
+        DB::transaction(function () use ($request, $thread, $data, $depth) {
             $comment = Comment::create([
                 'thread_id'       => $thread->id,
-                'parent_id'       => $parentId,
+                'parent_id'       => $data['parent_id'] ?? null,
                 'anon_session_id' => Auth::check() ? null : (int) $request->attributes->get('anon_id'),
                 'user_id'         => Auth::id(),
                 'depth'           => $depth,
                 'content'         => $data['content'],
+                'is_nsfw'         => $request->boolean('is_nsfw'),
             ]);
 
             if ($request->hasFile('images')) {

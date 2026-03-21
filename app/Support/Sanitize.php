@@ -13,6 +13,11 @@ class Sanitize
             'allow_unsafe_links' => false,
         ]);
 
-        return strip_tags($html, '<p><a><strong><em><ul><ol><li><code><pre><blockquote><br><hr>');
+        $html = strip_tags($html, '<p><a><strong><em><ul><ol><li><code><pre><blockquote><br><hr><span>');
+
+        // Parse ||spoiler text|| syntax
+        $html = preg_replace('/\|\|(.*?)\|\|/s', '<span class="spoiler">$1</span>', $html);
+
+        return $html;
     }
 }

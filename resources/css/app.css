@@ -49,3 +49,21 @@
 body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* ── Spoiler Text ── */
+.spoiler {
+    @apply bg-neutral-900 text-transparent select-none cursor-pointer transition-colors duration-300 rounded px-1;
+}
+.dark .spoiler {
+    @apply bg-neutral-200 text-transparent;
+}
+
+/* Reveal spoiler on hover or active */
+.spoiler:hover,
+.spoiler:active {
+    @apply bg-transparent text-neutral-900 select-auto;
+}
+.dark .spoiler:hover,
+.dark .spoiler:active {
+    @apply bg-transparent text-neutral-100;
+}

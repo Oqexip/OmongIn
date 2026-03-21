@@ -93,17 +93,33 @@
                             </p>
                         </div>
 
-                        <div class="flex items-center justify-end gap-2 pt-2">
+                        <div class="flex items-center justify-between pt-2">
                             <button type="button"
                                 class="h-10 px-4 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 shadow-sm"
                                 @click="open=false">
                                 Batal
                             </button>
-                            <button
-                                class="h-10 px-5 rounded-xl text-white shadow-sm font-medium
+                            <!-- Submit & NSFW -->
+                            <div class="flex items-center gap-2">
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <div class="relative flex items-center">
+                                        <input type="checkbox" name="is_nsfw" value="1"
+                                            class="peer appearance-none w-5 h-5 border-2 border-neutral-300 dark:border-neutral-600 rounded bg-white dark:bg-neutral-800 checked:bg-black checked:border-black dark:checked:bg-white dark:checked:border-white transition-all cursor-pointer">
+                                        <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white dark:text-black opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-colors">
+                                        Tandai sbg NSFW
+                                    </span>
+                                </label>
+
+                                <button type="submit"
+                                    class="h-10 px-5 rounded-xl text-white shadow-sm font-medium
                                    bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200">
-                                Post
-                            </button>
+                                    Post Thread
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -186,7 +202,18 @@
         @forelse ($threads as $t)
             <a href="{{ route('threads.show', $t) }}" class="group hover-card block p-4 transition">
                 <div class="flex items-start justify-between gap-3">
-                    <div class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+                    <div class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 flex items-center flex-wrap gap-2">
+                        @if($t->is_pinned)
+                            <span class="text-xs font-bold px-2 py-0.5 rounded flex items-center gap-1 
+                                         bg-neutral-900 text-white dark:bg-white dark:text-black">
+                                PINNED 📍
+                            </span>
+                        @endif
+                        @if($t->is_nsfw)
+                            <span class="text-xs font-bold px-2 py-0.5 rounded border border-red-500 text-red-600 dark:border-red-400 dark:text-red-400">
+                                NSFW
+                            </span>
+                        @endif
                         <span class="transition group-hover:underline underline-offset-4 decoration-2 decoration-neutral-400 dark:decoration-neutral-500">
                             {{ $t->title ?? Str::limit(strip_tags($t->content), 80) }}
                         </span>
