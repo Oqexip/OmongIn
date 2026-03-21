@@ -17,6 +17,7 @@ class ThreadController extends Controller
     {
         $q        = trim((string) $request->query('q', ''));
         $category = $request->query('category');
+        $sort     = $request->query('sort', 'newest');
 
         $threads = Thread::query()
             ->where('board_id', $board->id)
@@ -32,8 +33,21 @@ class ThreadController extends Controller
                 });
             })
             ->orderByDesc('is_pinned')
-            ->orderByDesc('score')
-            ->latest()
+            ->when($sort === 'most_liked', function ($query) {
+                $query->orderByDesc('score')->latest();
+            })
+            ->when($sort === 'most_active', function ($query) {
+                $query->orderByDesc('comment_count')->latest();
+            })
+            ->when($sort === 'oldest', function ($query) {
+                $query->oldest();
+            })
+            ->when($sort === 'newest', function ($query) {
+                $query->latest();
+            })
+            ->when(!in_array($sort, ['most_liked', 'most_active', 'oldest', 'newest']), function ($query) {
+                $query->orderByDesc('score')->latest();
+            })
             ->paginate(20)
             ->withQueryString();
 
@@ -45,6 +59,7 @@ class ThreadController extends Controller
             'categories' => $categories,
             'q'          => $q,
             'category'   => $category,
+            'sort'       => $sort,
             'title'      => $q ? "Hasil untuk \u201c{$q}\u201d di {$board->name}" : $board->name,
         ]);
     }

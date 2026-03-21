@@ -136,7 +136,7 @@
                 <select name="category"
                     class="h-11 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 text-sm
                            text-neutral-900 dark:text-neutral-100 outline-none
-                           focus:border-neutral-500 dark:focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition sm:w-56">
+                           focus:border-neutral-500 dark:focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition w-full sm:w-48">
                     <option value="">Semua Kategori</option>
                     @foreach ($categories as $cat)
                         <option value="{{ $cat->slug }}" @selected(request('category') === $cat->slug)>
@@ -146,9 +146,19 @@
                 </select>
             @endif
 
+            <select name="sort"
+                class="h-11 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 text-sm
+                       text-neutral-900 dark:text-neutral-100 outline-none
+                       focus:border-neutral-500 dark:focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition w-full sm:w-48">
+                <option value="newest" @selected(request('sort', 'newest') === 'newest')>Terbaru</option>
+                <option value="oldest" @selected(request('sort') === 'oldest')>Terlama</option>
+                <option value="most_liked" @selected(request('sort') === 'most_liked')>Terbanyak Disukai</option>
+                <option value="most_active" @selected(request('sort') === 'most_active')>Paling Ramai</option>
+            </select>
+
             <button
-                class="h-11 px-4 rounded-xl text-white shadow-sm bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 font-medium text-sm transition">
-                Filter
+                class="h-11 px-6 rounded-xl text-white shadow-sm bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 font-medium text-sm transition">
+                Terapkan
             </button>
         </div>
     </form>
