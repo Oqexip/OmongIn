@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Concerns\Votable;
 
 class Thread extends Model
@@ -30,6 +33,7 @@ class Thread extends Model
         'user_id'         => 'integer',
         'anon_session_id' => 'integer',
         'score'           => 'integer',
+        'comment_count'   => 'integer',
         'is_pinned'       => 'boolean',
         'edited_at'       => 'datetime',
         'created_at'      => 'datetime',
@@ -37,21 +41,48 @@ class Thread extends Model
         'deleted_at'      => 'datetime',
     ];
 
-    // ===== Relasi =====
-    public function user() { return $this->belongsTo(User::class); }
-    public function anon() { return $this->belongsTo(AnonSession::class, 'anon_session_id'); }
-    public function board() { return $this->belongsTo(Board::class); }
-    public function comments() { return $this->hasMany(Comment::class); }
-    public function votes() { return $this->morphMany(Vote::class, 'votable'); }
-    public function attachments() { return $this->morphMany(Attachment::class, 'attachable'); }
+    // ===== Relationships =====
 
-    // ===== Ownership & izin edit =====
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function anon(): BelongsTo
+    {
+        return $this->belongsTo(AnonSession::class, 'anon_session_id');
+    }
+
+    public function board(): BelongsTo
+    {
+        return $this->belongsTo(Board::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
+    }
+
+    // ===== Ownership & edit permissions =====
+
     public function isOwnedByRequest(Request $request): bool
     {
         if ($this->user_id) {
             return optional($request->user())->id === $this->user_id;
         }
+
         $anonId = (int) ($request->attributes->get('anon_id') ?? session('anon_id'));
+
         return $anonId === (int) $this->anon_session_id;
     }
 
@@ -60,20 +91,21 @@ class Thread extends Model
         return $this->created_at && $this->created_at->gt(now()->subMinutes(15));
     }
 
-    public function threads() { return $this->hasMany(Thread::class); }
+    // ===== Voting & score =====
 
-    // ===== Voting & skor =====
     public function recalcScore(): void
     {
         $this->score = (int) $this->votes()->sum('value');
         $this->saveQuietly();
     }
 
-    // ===== Pencarian (dipertahankan) =====
+    // ===== Search =====
+
     public static function supportsFullText(): bool
     {
         $connection = config('database.default');
         $driver     = config("database.connections.$connection.driver");
+
         return $driver === 'mysql';
     }
 
@@ -101,34 +133,26 @@ class Thread extends Model
     public function getExcerptAttribute(): string
     {
         $plain = trim(strip_tags((string) $this->content));
+
         return str($plain)->limit(160)->toString();
     }
 
-    public function category() { return $this->belongsTo(Category::class); }
-
     /**
-     * Tambahkan kolom virtual 'user_vote' pada hasil query.
-     * - Jika login → filter user_id
-     * - Jika anonim → filter anon_session_id
-     * - Jika keduanya null → subquery tidak mengembalikan baris (NULL)
-     *
-     * NOTE: sesuaikan nilai votable_type di bawah dengan yang kamu simpan di tabel votes.
-     * Jika kamu menyimpan class name, ganti 'thread' menjadi Thread::class.
+     * Add a virtual 'user_vote' column to query results.
+     * Uses user_id if logged in, anon_key if anonymous.
      */
-public function scopeWithUserVote($query, ?int $userId, ?string $anonKey)
-{
-    // IMPORTANT: votable_type di DB kamu = FQCN (App\Models\Thread) → pakai itu
-    $type = self::class;
+    public function scopeWithUserVote($query, ?int $userId, ?string $anonKey)
+    {
+        $type = self::class;
 
-    return $query->select('threads.*')->selectSub(function ($q) use ($userId, $anonKey, $type) {
-        $q->from('votes')
-          ->select('value')
-          ->whereColumn('votes.votable_id', 'threads.id')
-          ->where('votes.votable_type', $type)
-          ->when($userId,  fn ($qq) => $qq->where('user_id', $userId))
-          ->when(!$userId, fn ($qq) => $qq->where('anon_key', $anonKey))
-          ->limit(1);
-    }, 'user_vote');
-}
-
+        return $query->select('threads.*')->selectSub(function ($q) use ($userId, $anonKey, $type) {
+            $q->from('votes')
+              ->select('value')
+              ->whereColumn('votes.votable_id', 'threads.id')
+              ->where('votes.votable_type', $type)
+              ->when($userId,  fn ($qq) => $qq->where('user_id', $userId))
+              ->when(!$userId, fn ($qq) => $qq->where('anon_key', $anonKey))
+              ->limit(1);
+        }, 'user_vote');
+    }
 }

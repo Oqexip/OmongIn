@@ -10,7 +10,7 @@ use App\Http\Controllers\PopularController;
 
 
 
-// ✅ route vote diletakkan DI SINI (sebelum fallback)
+// Vote route (before fallback)
 Route::middleware('anon')->post('/vote', [VoteController::class, 'store'])->name('vote.store');
 
 Route::middleware('anon')->group(function () {
@@ -35,6 +35,9 @@ Route::middleware('anon')->group(function () {
 
     Route::patch('/c/{comment}', [CommentController::class, 'update'])->name('comments.update');
     Route::delete('/c/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+
+    // Popular
+    Route::get('/popular', [PopularController::class, 'index'])->name('popular.index');
 });
 
 Route::get('/dashboard', fn () => view('dashboard'))
@@ -46,8 +49,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile',[ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile',[ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-Route::get('/popular', [PopularController::class, 'index'])->name('popular.index');
 
 require __DIR__.'/auth.php';
 

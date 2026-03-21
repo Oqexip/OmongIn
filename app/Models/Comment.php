@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Concerns\Votable;
 
 class Comment extends Model
 {
     use HasFactory, SoftDeletes;
-    use Votable; 
+    use Votable;
 
     protected $fillable = [
         'thread_id',
@@ -28,41 +31,45 @@ class Comment extends Model
     ];
 
     // === Relationships ===
-    public function user()
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-    public function anon()
+
+    public function anon(): BelongsTo
     {
         return $this->belongsTo(AnonSession::class, 'anon_session_id');
     }
-    public function thread()
+
+    public function thread(): BelongsTo
     {
         return $this->belongsTo(Thread::class);
     }
-    public function parent()
+
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Comment::class, 'parent_id');
     }
-    public function children()
+
+    public function children(): HasMany
     {
         return $this->hasMany(Comment::class, 'parent_id')->orderBy('created_at');
     }
-    public function votes()
+
+    public function attachments(): MorphMany
     {
-        return $this->morphMany(Vote::class, 'votable');
-    }
-    public function attachments()
-    {
-        return $this->morphMany(\App\Models\Attachment::class, 'attachable');
+        return $this->morphMany(Attachment::class, 'attachable');
     }
 
     // === Ownership / permission helpers ===
+
     public function isOwnedByRequest(Request $request): bool
     {
         if ($this->user_id) {
             return $request->user()?->id === $this->user_id;
         }
+
         return (int) $request->attributes->get('anon_id') === (int) $this->anon_session_id;
     }
 
@@ -72,17 +79,19 @@ class Comment extends Model
     }
 
     // === Voting ===
+
     public function recalcScore(): void
     {
         $this->score = (int) $this->votes()->sum('value');
         $this->saveQuietly();
     }
 
-    // === Nice-to-have: accessor untuk Blade ===
+    // === Accessor ===
+
     protected function isEdited(): Attribute
     {
         return Attribute::make(
-            get: fn() => ! is_null($this->edited_at)
+            get: fn () => ! is_null($this->edited_at)
         );
     }
 }

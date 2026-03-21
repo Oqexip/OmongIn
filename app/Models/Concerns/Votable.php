@@ -1,6 +1,5 @@
 <?php
 
-// app/Models/Concerns/Votable.php
 namespace App\Models\Concerns;
 
 use App\Models\Vote;
@@ -14,15 +13,17 @@ trait Votable
         return $this->morphMany(Vote::class, 'votable');
     }
 
-    /** Ambil vote milik viewer saat ini (user atau anon_key) */
+    /** Get the vote belonging to the current viewer (authenticated user or anon_key). */
     public function currentViewerVote(?string $anonKey = null): ?Vote
     {
-        if (!Auth::check()) {
+        if (Auth::check()) {
             return $this->votes()->where('user_id', Auth::id())->first();
         }
+
         if ($anonKey) {
             return $this->votes()->where('anon_key', $anonKey)->first();
         }
+
         return null;
     }
 }

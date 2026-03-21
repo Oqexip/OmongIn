@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Http\Middleware;
+namespace App\Http\Middleware;
 
 use App\Models\AnonSession;
 use Closure;
