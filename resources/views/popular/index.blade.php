@@ -43,8 +43,7 @@
                                   {{ $days == $d ? 'bg-sky-600 text-white border-sky-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50' }}">
                             {{ $label }}
                         </a>
-                    @endforeach
-                </div>
+                    @endforeach                </div>
 
                 @if ($threads->isEmpty())
                     <p class="text-gray-500">Belum ada thread populer untuk periode ini.</p>

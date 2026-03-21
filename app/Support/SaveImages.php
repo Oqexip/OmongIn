@@ -14,7 +14,7 @@ class SaveImages
         foreach ($files as $file) {
             if (!$file instanceof UploadedFile) continue;
 
-            $path = $file->store('uploads', 'public'); // storage/app/public/uploads/...
+            $path = $file->store('uploads', options: 'public'); // storage/app/public/uploads/...
             [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
 
             $saved[] = [
