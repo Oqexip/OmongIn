@@ -10,18 +10,25 @@ Users can create threads, post comments, and reply without revealing their real 
 ---
 
 ## ✨ Features
-- 🔐 **Authentication** (register, login, logout)  
-- 🗂️ **Boards & Threads**  
-  - Create custom boards (e.g., General, Science, Books, etc.)  
-  - Start discussion threads under specific boards  
-- 💬 **Posts, Comments & Replies**  
-  - Supports both anonymous and registered users  
-  - Nested (threaded) comments & replies  
-- ✏️ **Edit & Delete**  
-  - Only the owner of a post, comment, or reply can edit/delete  
-  - Editing is limited to **15 minutes** after posting  
-- 📎 **Image Upload** (optional for posts/threads)  
-- 📱 **Responsive UI** powered by TailwindCSS  
+
+**Core Features**
+- 🔐 **Authentication:** Register, login, and profile management (`/profile`).
+- 🗂️ **Boards & Threads:** Create custom boards and start discussions.
+- 💬 **Nested Comments:** Reply to threads and other comments with threaded views.
+- 🎭 **Anonymous Sessions:** Middleware tracking allows anonymous users to post and vote without an account.
+- ✏️ **Edit & Delete:** Modify or remove your own posts/comments (editing is limited to 15 minutes).
+
+**Interaction & Moderation**
+- ⬆️ **Voting System:** Upvote and downvote threads or comments.
+- 📈 **Popular Threads:** Trending page (`/popular`) showcasing the most interactive discussions.
+- 🚩 **Reporting System:** Report problematic content (Spam, Abuse, NSFW, etc.).
+- 🔍 **Search & Filters:** Global search functionality and advanced sorting (Newest, Oldest, Top, Hot).
+- 🙈 **Spoilers & NSFW Tags:** "Click to reveal" protection for sensitive text and images.
+
+**UI/UX**
+- 🌗 **Monochrome Design:** Clean, modern monochrome aesthetic with **Dark Mode** & **Light Mode** toggle.
+- 📱 **Responsive:** Fully responsive design using TailwindCSS, featuring an Inter font typography.
+- 📎 **Media Uploads:** Support for image attachments with spoiler/NSFW blurring capabilities.
 
 ---
 
