@@ -45,7 +45,9 @@ class CommentPolicy
      */
     public function delete(User $user, Comment $comment): bool
     {
-        return $user->isAdmin() || $comment->user_id === $user->id;
+        return $user->isAdmin()
+            || $comment->user_id === $user->id
+            || $user->isModeratorOf($comment->thread->board);
     }
 
 

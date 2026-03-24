@@ -18,6 +18,9 @@ class Sanitize
         // Parse ||spoiler text|| syntax
         $html = preg_replace('/\|\|(.*?)\|\|/s', '<span class="spoiler">$1</span>', $html);
 
+        // Render @mentions as styled spans
+        $html = MentionService::renderMentions($html);
+
         return $html;
     }
 

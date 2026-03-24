@@ -6,6 +6,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\UserSearchController;
+use App\Http\Controllers\BoardModeratorController;
+use App\Http\Controllers\ModeratorInvitationController;
 use App\Models\Board;
 use App\Http\Controllers\PopularController;
 
@@ -52,6 +57,30 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile',  [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile',[ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile',[ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
+
+    // Bookmarks
+    Route::post('/t/{thread}/bookmark', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
+    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+
+    // User search (for @mention autocomplete)
+    Route::get('/api/users/search', [UserSearchController::class, 'search'])->name('api.users.search');
+
+    // Moderator invitation accept/decline
+    Route::post('/moderator-invitation/{invitation}/accept', [ModeratorInvitationController::class, 'accept'])->name('moderator.invitation.accept');
+    Route::post('/moderator-invitation/{invitation}/decline', [ModeratorInvitationController::class, 'decline'])->name('moderator.invitation.decline');
+});
+
+// Admin: Board moderator management
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/b/{board:slug}/moderators', [BoardModeratorController::class, 'index'])->name('admin.board.moderators.index');
+    Route::post('/admin/b/{board:slug}/moderators', [BoardModeratorController::class, 'store'])->name('admin.board.moderators.store');
+    Route::delete('/admin/b/{board:slug}/moderators/{user}', [BoardModeratorController::class, 'destroy'])->name('admin.board.moderators.destroy');
 });
 
 require __DIR__.'/auth.php';
@@ -59,3 +88,4 @@ require __DIR__.'/auth.php';
 Route::fallback(function () {
     abort(404);
 });
+

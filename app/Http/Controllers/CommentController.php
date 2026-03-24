@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Support\SaveImages;
+use App\Support\MentionService;
 
 class CommentController extends Controller
 {
@@ -58,6 +59,11 @@ class CommentController extends Controller
             }
 
             $thread->increment('comment_count');
+
+            // Parse @mentions and create notifications (only if sender is logged in)
+            if (Auth::check()) {
+                MentionService::parse($comment);
+            }
         });
 
         return back()->with('ok', 'Posted');

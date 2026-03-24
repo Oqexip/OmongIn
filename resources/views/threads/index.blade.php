@@ -9,10 +9,20 @@
                 /{{ $board->slug }}
             </a>
 
-            <button @click="open = true"
-                class="px-4 py-2 rounded-xl text-white bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 text-sm font-medium transition shadow-sm">
-                + New Thread
-            </button>
+            <div class="flex items-center gap-2">
+                @auth
+                    @if (auth()->user()->isAdmin())
+                        <a href="{{ route('admin.board.moderators.index', $board) }}"
+                           class="px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-sm text-neutral-700 dark:text-neutral-300 shadow-sm transition">
+                            ⚙ Moderator
+                        </a>
+                    @endif
+                @endauth
+                <button @click="open = true"
+                    class="px-4 py-2 rounded-xl text-white bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 text-sm font-medium transition shadow-sm">
+                    + New Thread
+                </button>
+            </div>
         </div>
 
         {{-- Teleport modal --}}

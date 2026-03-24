@@ -6,6 +6,8 @@
         $palette = ['rose','orange','amber','emerald','teal','sky','violet','pink','yellow','lime','cyan','blue','indigo','purple','fuchsia'];
         $color = isset($h['color'], $palette[$h['color']]) ? $palette[$h['color']] : 'gray';
         $canEditThread = $thread->canEditNow() && $thread->isOwnedByRequest(request());
+        $isBookmarked = auth()->check() && auth()->user()->hasBookmarked($thread);
+        $isBoardMod = auth()->check() && auth()->user()->isModeratorOf($thread->board);
     @endphp
 
     {{-- Header Board --}}
@@ -46,6 +48,9 @@
                 <div class="text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-2">
                     @if ($isAuthUser)
                         <span class="font-semibold text-neutral-800 dark:text-neutral-200">{{ $thread->user->name }}</span>
+                        @if ($thread->user->isModeratorOf($thread->board))
+                            <span class="inline-flex items-center rounded-md bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-bold text-neutral-600 dark:text-neutral-400 border border-neutral-300 dark:border-neutral-600">MOD</span>
+                        @endif
                     @else
                         <span class="font-semibold {{ 'text-' . $color . '-600' }}">{{ $h['name'] ?? 'Anon' }}</span>
                     @endif
@@ -95,6 +100,18 @@
                         </svg>
                         Save
                     </button>
+
+                    @auth
+                        <form method="POST" action="{{ route('bookmarks.toggle', $thread) }}">
+                            @csrf
+                            <button class="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neutral-500" fill="{{ $isBookmarked ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                </svg>
+                                {{ $isBookmarked ? 'Hapus Bookmark' : 'Bookmark' }}
+                            </button>
+                        </form>
+                    @endauth
 
                     @can('delete', $thread)
                         <form method="POST" action="{{ route('threads.destroy', $thread) }}"
@@ -278,4 +295,125 @@
             __updateFileLabel(input);
         }
     </script>
+
+    {{-- @Mention Autocomplete --}}
+    @auth
+    <script>
+    (function() {
+        const textarea = document.querySelector('textarea[name="content"]');
+        if (!textarea) return;
+
+        let dropdown = null;
+        let debounceTimer = null;
+
+        textarea.addEventListener('input', function(e) {
+            clearTimeout(debounceTimer);
+
+            const val = this.value;
+            const pos = this.selectionStart;
+            const before = val.substring(0, pos);
+
+            // Find @mention pattern at cursor
+            const match = before.match(/@([a-zA-Z0-9_.-]*)$/);
+
+            if (!match || match[1].length < 1) {
+                removeMentionDropdown();
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                fetchUsers(match[1], match.index, pos);
+            }, 300);
+        });
+
+        textarea.addEventListener('keydown', function(e) {
+            if (!dropdown) return;
+            const items = dropdown.querySelectorAll('[data-mention]');
+            const active = dropdown.querySelector('.bg-neutral-100, .dark\\:bg-neutral-800');
+            let idx = Array.from(items).indexOf(active);
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                idx = Math.min(idx + 1, items.length - 1);
+                highlightItem(items, idx);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                idx = Math.max(idx - 1, 0);
+                highlightItem(items, idx);
+            } else if (e.key === 'Enter' && active) {
+                e.preventDefault();
+                selectUser(active.dataset.mention);
+            } else if (e.key === 'Escape') {
+                removeMentionDropdown();
+            }
+        });
+
+        function highlightItem(items, idx) {
+            items.forEach(i => { i.classList.remove('bg-neutral-100', 'dark:bg-neutral-800'); });
+            if (items[idx]) items[idx].classList.add('bg-neutral-100', 'dark:bg-neutral-800');
+        }
+
+        function fetchUsers(query, matchStart, cursorPos) {
+            fetch(`{{ route('api.users.search') }}?q=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(users => {
+                    if (users.length === 0) { removeMentionDropdown(); return; }
+                    showMentionDropdown(users, matchStart, cursorPos);
+                })
+                .catch(() => removeMentionDropdown());
+        }
+
+        function showMentionDropdown(users, matchStart, cursorPos) {
+            removeMentionDropdown();
+
+            dropdown = document.createElement('div');
+            dropdown.id = 'mention-dropdown';
+            dropdown.className = 'absolute z-50 w-56 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-xl py-1 overflow-hidden';
+
+            // Position near textarea
+            const rect = textarea.getBoundingClientRect();
+            dropdown.style.position = 'fixed';
+            dropdown.style.left = rect.left + 'px';
+            dropdown.style.top = (rect.bottom + 4) + 'px';
+
+            users.forEach((u, i) => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.dataset.mention = u.name;
+                item.dataset.matchStart = matchStart;
+                item.dataset.cursorPos = cursorPos;
+                item.className = 'w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300' + (i === 0 ? ' bg-neutral-100 dark:bg-neutral-800' : '');
+                item.innerHTML = `<span class="font-medium">@${u.name}</span>`;
+                item.addEventListener('click', () => selectUser(u.name));
+                dropdown.appendChild(item);
+            });
+
+            document.body.appendChild(dropdown);
+        }
+
+        function selectUser(name) {
+            const val = textarea.value;
+            const pos = textarea.selectionStart;
+            const before = val.substring(0, pos);
+            const after = val.substring(pos);
+            const newBefore = before.replace(/@[a-zA-Z0-9_.-]*$/, '@' + name + ' ');
+            textarea.value = newBefore + after;
+            textarea.selectionStart = textarea.selectionEnd = newBefore.length;
+            textarea.focus();
+            removeMentionDropdown();
+        }
+
+        function removeMentionDropdown() {
+            if (dropdown) { dropdown.remove(); dropdown = null; }
+        }
+
+        // Close dropdown on click outside
+        document.addEventListener('click', function(e) {
+            if (dropdown && !dropdown.contains(e.target) && e.target !== textarea) {
+                removeMentionDropdown();
+            }
+        });
+    })();
+    </script>
+    @endauth
 </x-app-layout>

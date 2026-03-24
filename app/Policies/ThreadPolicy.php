@@ -8,7 +8,9 @@ class ThreadPolicy
 {
     public function delete(User $user, Thread $thread): bool
     {
-        return $user->isAdmin() || $thread->user_id === $user->id;
+        return $user->isAdmin()
+            || $thread->user_id === $user->id
+            || $user->isModeratorOf($thread->board);
     }
 
     public function create(?User $user): bool

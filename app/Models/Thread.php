@@ -77,6 +77,11 @@ class Thread extends Model
         return $this->morphMany(Attachment::class, 'attachable');
     }
 
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
     // ===== Ownership & edit permissions =====
 
     public function isOwnedByRequest(Request $request): bool

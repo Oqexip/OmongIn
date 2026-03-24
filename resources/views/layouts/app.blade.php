@@ -82,6 +82,37 @@
           </button>
 
           @auth
+            @php
+                $unreadNotifCount = auth()->user()->notifications()->unread()->count();
+            @endphp
+            {{-- Bookmarks --}}
+            <a href="{{ route('bookmarks.index') }}"
+               class="inline-flex items-center justify-center h-9 w-9 rounded-xl border border-neutral-200 dark:border-neutral-700
+                      bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 shadow-sm transition
+                      {{ request()->routeIs('bookmarks.*') ? 'text-black dark:text-white' : 'text-neutral-500 dark:text-neutral-400' }}"
+               title="Tersimpan">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+            </a>
+
+            {{-- Notifications --}}
+            <a href="{{ route('notifications.index') }}"
+               class="relative inline-flex items-center justify-center h-9 w-9 rounded-xl border border-neutral-200 dark:border-neutral-700
+                      bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 shadow-sm transition
+                      {{ request()->routeIs('notifications.*') ? 'text-black dark:text-white' : 'text-neutral-500 dark:text-neutral-400' }}"
+               title="Notifikasi">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              @if($unreadNotifCount > 0)
+                  <span class="absolute flex items-center justify-center rounded-full font-bold text-white shadow-sm ring-2 ring-white dark:ring-neutral-900"
+                        style="top: -6px; right: -6px; background-color: #ef4444; min-width: 18px; height: 18px; font-size: 10px; padding: 0 4px;">
+                      {{ $unreadNotifCount }}
+                  </span>
+              @endif
+            </a>
+
             <span class="text-sm text-neutral-500 dark:text-neutral-400 mr-1">Hi, <span class="font-medium text-neutral-900 dark:text-white">{{ auth()->user()->name }}</span></span>
             <form method="POST" action="{{ route('logout') }}">
               @csrf
@@ -181,6 +212,21 @@
 
           {{-- Auth --}}
           @auth
+            <a href="{{ route('bookmarks.index') }}"
+               class="block px-3 h-10 leading-10 rounded-xl border border-neutral-200 dark:border-neutral-700
+                      bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-sm shadow-sm mb-2 text-center
+                      {{ request()->routeIs('bookmarks.*') ? 'text-black dark:text-white font-semibold' : 'text-neutral-600 dark:text-neutral-400' }}">
+              &#128278; Tersimpan
+            </a>
+            <a href="{{ route('notifications.index') }}"
+               class="block px-3 h-10 leading-10 rounded-xl border border-neutral-200 dark:border-neutral-700
+                      bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-sm shadow-sm mb-2 text-center
+                      {{ request()->routeIs('notifications.*') ? 'text-black dark:text-white font-semibold' : 'text-neutral-600 dark:text-neutral-400' }}">
+              &#128276; Notifikasi
+              @if($unreadNotifCount > 0)
+                  <span class="ml-1 rounded-full px-2 py-0.5 font-bold text-white" style="background-color: #ef4444; font-size: 11px;">{{ $unreadNotifCount }}</span>
+              @endif
+            </a>
             <div class="px-2 py-2 text-sm text-neutral-500 dark:text-neutral-400">Hi, <span class="font-medium text-neutral-900 dark:text-white">{{ auth()->user()->name }}</span></div>
             <form method="POST" action="{{ route('logout') }}" class="px-2 pb-2">
               @csrf
@@ -234,7 +280,7 @@
       <p>&copy; {{ date('Y') }} OmongIn</p>
       <p>
         <span class="text-neutral-400 dark:text-neutral-500">Made by</span>
-        <span class="font-bold tracking-tight text-black dark:text-white">Oqexip</span>
+        <a href="https://github.com/Oqexip" class="font-bold tracking-tight text-black dark:text-white">Oqexip</a>
       </p>
     </div>
   </footer>
