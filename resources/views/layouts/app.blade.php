@@ -45,11 +45,21 @@
 
         {{-- Tengah: Menu utama (center) --}}
         <nav class="flex items-stretch justify-center gap-6">
+          @if (auth()->check() && auth()->user()->isAdmin())
+            <a href="{{ route('admin.dashboard') }}"
+               class="inline-flex items-center text-sm font-medium px-1 pb-2 border-b-2 transition
+                      {{ request()->is('admin*') ? 'text-black dark:text-white border-black dark:border-white' : 'text-neutral-500 dark:text-neutral-400 border-transparent hover:text-black dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-600' }}">
+              Dashboard
+            </a>
+          @endif
+          
           <a href="{{ route('home') }}"
              class="inline-flex items-center text-sm font-medium px-1 pb-2 border-b-2 transition
-                    {{ request()->routeIs('home') ? 'text-black dark:text-white border-black dark:border-white' : 'text-neutral-500 dark:text-neutral-400 border-transparent hover:text-black dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-600' }}">
+                    {{ request()->routeIs('home') || request()->routeIs('boards.*') || request()->routeIs('threads.*') ? 'text-black dark:text-white border-black dark:border-white' : 'text-neutral-500 dark:text-neutral-400 border-transparent hover:text-black dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-600' }}">
             Boards
           </a>
+          
+
           <a href="{{ route('popular.index') }}"
              class="inline-flex items-center text-sm font-medium px-1 pb-2 border-b-2 transition
                     {{ request()->routeIs('popular.*') ? 'text-black dark:text-white border-black dark:border-white' : 'text-neutral-500 dark:text-neutral-400 border-transparent hover:text-black dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-600' }}">
@@ -85,6 +95,7 @@
             @php
                 $unreadNotifCount = auth()->user()->notifications()->unread()->count();
             @endphp
+
             {{-- Bookmarks --}}
             <a href="{{ route('bookmarks.index') }}"
                class="inline-flex items-center justify-center h-9 w-9 rounded-xl border border-neutral-200 dark:border-neutral-700

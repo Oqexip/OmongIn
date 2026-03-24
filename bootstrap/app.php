@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'anon' => EnsureAnonSession::class,
             'anonKey' => EnsureAnonKey::class,
         ]);
+
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckBanned::class,
+        ]);
     })
     ->withProviders([
         AuthServiceProvider::class, // <-- tambahkan ini

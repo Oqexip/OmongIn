@@ -24,6 +24,31 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->role === 'admin';
     }
 
+    // === Ban helpers ===
+
+    public function isBanned(): bool
+    {
+        if (is_null($this->banned_at)) {
+            return false;
+        }
+
+        // If banned_until is set and has passed, user is no longer banned
+        if ($this->banned_until && now()->greaterThan($this->banned_until)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function scopeBanned($query)
+    {
+        return $query->whereNotNull('banned_at')
+            ->where(function ($q) {
+                $q->whereNull('banned_until')
+                  ->orWhere('banned_until', '>', now());
+            });
+    }
+
     public function isModeratorOf(Board $board): bool
     {
         return $this->moderatedBoards()->where('board_id', $board->id)->exists();
@@ -75,6 +100,9 @@ class User extends Authenticatable implements MustVerifyEmailContract
         'name',
         'email',
         'password',
+        'banned_at',
+        'banned_until',
+        'ban_reason',
     ];
 
     /**
@@ -97,6 +125,8 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'banned_at' => 'datetime',
+            'banned_until' => 'datetime',
         ];
     }
 }
