@@ -296,5 +296,8 @@
     </div>
   </footer>
 
+  {{-- Global image lightbox --}}
+  <x-image-lightbox />
+
 </body>
 </html>

@@ -105,13 +105,20 @@
         <div class="prose dark:prose-invert max-w-none">{!! \App\Support\Sanitize::toHtml($c->content) !!}</div>
 
         @if ($c->attachments->count() > 0)
+            @php
+                $commentUrls = $c->attachments->map(fn($a) => Storage::url($a->path))->values()->toJson();
+            @endphp
             <div class="mt-3 grid grid-cols-2 gap-2">
                 @foreach ($c->attachments as $a)
                     @php $url = Storage::url($a->path); @endphp
                     <div x-data="{ revealed: {{ ($c->is_nsfw || $c->is_spoiler) ? 'false' : 'true' }} }" class="relative aspect-[4/3] bg-neutral-100 dark:bg-neutral-900 rounded-md overflow-hidden border border-neutral-100 dark:border-neutral-800">
-                        <a href="{{ $url }}" target="_blank" class="absolute inset-0 z-10 block" x-show="revealed">
+                        <button
+                            type="button"
+                            x-show="revealed"
+                            @click="$dispatch('open-lightbox', { images: {{ $commentUrls }}, index: {{ $loop->index }} })"
+                            class="absolute inset-0 z-10 block cursor-zoom-in">
                             <img src="{{ $url }}" alt="Attachment" class="w-full h-full object-cover hover:opacity-90 transition" loading="lazy">
-                        </a>
+                        </button>
 
                         @if($c->is_nsfw || $c->is_spoiler)
                             <button type="button" @click="revealed = true" x-show="!revealed"

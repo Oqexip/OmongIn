@@ -136,15 +136,21 @@
             </div>
 
             @if ($thread->attachments->count() > 0)
+                @php
+                    $allUrls = $thread->attachments->map(fn($a) => Storage::url($a->path))->values()->toJson();
+                @endphp
                 <div class="mt-6 mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                     @foreach ($thread->attachments as $attachment)
+                        @php $url = Storage::url($attachment->path); @endphp
                         <div x-data="{ revealed: {{ ($thread->is_nsfw || $thread->is_spoiler) ? 'false' : 'true' }} }" class="relative aspect-square bg-neutral-100 dark:bg-neutral-900 rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
-                            <a href="{{ Storage::url($attachment->path) }}" target="_blank"
-                               class="absolute inset-0 z-10 block"
-                               x-show="revealed">
-                                <img src="{{ Storage::url($attachment->path) }}" alt="Attachment"
+                            <button
+                                type="button"
+                                x-show="revealed"
+                                @click="$dispatch('open-lightbox', { images: {{ $allUrls }}, index: {{ $loop->index }} })"
+                                class="absolute inset-0 z-10 block cursor-zoom-in">
+                                <img src="{{ $url }}" alt="Attachment"
                                      class="w-full h-full object-cover hover:opacity-90 transition" loading="lazy">
-                            </a>
+                            </button>
 
                             @if($thread->is_nsfw || $thread->is_spoiler)
                                 <button type="button" @click="revealed = true" x-show="!revealed"
@@ -159,6 +165,11 @@
                         </div>
                     @endforeach
                 </div>
+            @endif
+
+            {{-- Poll --}}
+            @if ($thread->poll)
+                <x-poll-display :poll="$thread->poll" />
             @endif
 
             <div class="mt-4 flex justify-end">

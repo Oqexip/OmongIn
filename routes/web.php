@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AdminBanAppealController;
 use App\Http\Controllers\BanAppealController;
 use App\Models\Board;
 use App\Http\Controllers\PopularController;
+use App\Http\Controllers\PollController;
 
 // Banned page (standalone, no auth required)
 Route::get('/banned', fn () => view('admin.banned'))->name('banned.show');
@@ -57,6 +58,9 @@ Route::middleware('anon')->group(function () {
 
     // Popular
     Route::get('/popular', [PopularController::class, 'index'])->name('popular.index');
+
+    // Polls (vote)
+    Route::post('/polls/{poll}/vote', [PollController::class, 'vote'])->name('polls.vote');
 });
 
 Route::get('/dashboard', fn () => view('dashboard'))

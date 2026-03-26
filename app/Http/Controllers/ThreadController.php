@@ -69,7 +69,7 @@ class ThreadController extends Controller
      */
     public function show(Thread $thread)
     {
-        $thread->load(['user', 'comments.user']);
+        $thread->load(['user', 'comments.user', 'poll.options', 'poll.votes']);
 
         $comments = $thread->comments()->orderBy('created_at')->get();
         $grouped  = $comments->groupBy('parent_id');
@@ -83,16 +83,21 @@ class ThreadController extends Controller
     public function store(Request $request, Board $board)
     {
         $data = $request->validate([
-            'title'       => ['required', 'string', 'max:140'],
-            'content'     => ['required', 'string', 'min:3', 'max:10000'],
-            'category_id' => [
+            'title'          => ['required', 'string', 'max:140'],
+            'content'        => ['required', 'string', 'min:3', 'max:10000'],
+            'category_id'    => [
                 'nullable',
                 'integer',
                 Rule::exists('categories', 'id')->where('board_id', $board->id),
             ],
-            'images.*'   => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
-            'is_nsfw'    => ['nullable', 'boolean'],
-            'is_spoiler' => ['nullable', 'boolean'],
+            'images.*'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
+            'is_nsfw'        => ['nullable', 'boolean'],
+            'is_spoiler'     => ['nullable', 'boolean'],
+            // Poll fields (all optional as a group)
+            'poll_question'  => ['nullable', 'string', 'max:255'],
+            'poll_options'   => ['nullable', 'array', 'min:2', 'max:6'],
+            'poll_options.*' => ['required_with:poll_question', 'string', 'max:255'],
+            'poll_expires'   => ['nullable', 'date', 'after:now'],
         ]);
 
         $thread = Thread::create([
@@ -109,6 +114,22 @@ class ThreadController extends Controller
         if ($request->hasFile('images')) {
             foreach (SaveImages::storeMany($request->file('images')) as $att) {
                 $thread->attachments()->create($att);
+            }
+        }
+
+        // Create poll if question is provided and has at least 2 non-empty options
+        if (! empty($data['poll_question']) && ! empty($data['poll_options'])) {
+            $nonEmpty = array_filter(array_map('trim', $data['poll_options']), fn ($v) => $v !== '');
+            if (count($nonEmpty) >= 2) {
+                $poll = $thread->poll()->create([
+                    'question'   => trim($data['poll_question']),
+                    'expires_at' => $data['poll_expires'] ?? null,
+                    'is_closed'  => false,
+                ]);
+
+                foreach ($nonEmpty as $label) {
+                    $poll->options()->create(['label' => $label]);
+                }
             }
         }
 

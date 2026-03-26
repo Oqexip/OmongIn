@@ -31,7 +31,7 @@
                 <div class="absolute inset-0 bg-black/50 dark:bg-black/70" @click="open = false" aria-hidden="true"></div>
 
                 <div x-show="open" x-transition @keydown.escape.window="open = false"
-                    class="relative z-50 bg-white dark:bg-neutral-900 p-6 rounded-xl w-full max-w-lg shadow-2xl border border-neutral-200 dark:border-neutral-800">
+                    class="relative z-50 bg-white dark:bg-neutral-900 p-6 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl border border-neutral-200 dark:border-neutral-800">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-bold text-black dark:text-white">Buat Thread Baru</h2>
                         <button @click="open=false" class="p-1 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500"
@@ -101,6 +101,67 @@
                             <p class="text-xs text-neutral-400 dark:text-neutral-500">
                                 Format: jpg, jpeg, png, webp, gif • Maks 4MB per gambar
                             </p>
+                        </div>
+
+                        {{-- Poll Builder --}}
+                        <div x-data="{
+                            pollEnabled: false,
+                            options: ['', ''],
+                            addOption() { if (this.options.length < 6) this.options.push(''); },
+                            removeOption(i) { if (this.options.length > 2) this.options.splice(i, 1); }
+                        }">
+                            {{-- Toggle --}}
+                            <button type="button" @click="pollEnabled = !pollEnabled"
+                                    class="flex items-center gap-2 h-10 px-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 shadow-sm transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neutral-500" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 3h4v18H3V3zm7 6h4v12h-4V9zm7-4h4v16h-4V5z"/>
+                                </svg>
+                                <span x-text="pollEnabled ? 'Hapus Polling' : '+ Tambah Polling'"></span>
+                            </button>
+
+                            {{-- Poll fields --}}
+                            <div x-show="pollEnabled" x-cloak class="mt-3 space-y-3 p-4 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50">
+                                <input type="text" name="poll_question"
+                                       :required="pollEnabled"
+                                       placeholder="Pertanyaan polling…"
+                                       class="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3.5 py-2.5 text-[15px] text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 shadow-sm focus:outline-none focus:border-neutral-500 dark:focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700">
+
+                                {{-- Options --}}
+                                <div class="space-y-2">
+                                    <template x-for="(opt, i) in options" :key="i">
+                                        <div class="flex items-center gap-2">
+                                            <input type="text" :name="'poll_options[' + i + ']'"
+                                                   x-model="options[i]"
+                                                   :placeholder="'Opsi ' + (i + 1)"
+                                                   :required="pollEnabled"
+                                                   class="flex-1 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 shadow-sm focus:outline-none focus:border-neutral-500 dark:focus:border-neutral-400 focus:ring-1 focus:ring-neutral-200 dark:focus:ring-neutral-700">
+                                            <button type="button" @click="removeOption(i)"
+                                                    x-show="options.length > 2"
+                                                    class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-red-50 dark:hover:bg-red-900/30 text-neutral-400 hover:text-red-500 transition shrink-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <button type="button" @click="addOption()"
+                                        x-show="options.length < 6"
+                                        class="text-sm text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                    Tambah opsi <span class="text-neutral-400 dark:text-neutral-600">(<span x-text="options.length"></span>/6)</span>
+                                </button>
+
+                                {{-- Expires at --}}
+                                <div>
+                                    <label class="block text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1">Batas waktu voting (opsional)</label>
+                                    <input type="datetime-local" name="poll_expires"
+                                           class="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 shadow-sm focus:outline-none focus:border-neutral-500 dark:focus:border-neutral-400 focus:ring-1 focus:ring-neutral-200 dark:focus:ring-neutral-700">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex items-center justify-between pt-2">

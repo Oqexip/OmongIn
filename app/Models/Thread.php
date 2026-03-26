@@ -82,6 +82,11 @@ class Thread extends Model
         return $this->hasMany(Bookmark::class);
     }
 
+    public function poll(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Poll::class);
+    }
+
     // ===== Ownership & edit permissions =====
 
     public function isOwnedByRequest(Request $request): bool
