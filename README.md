@@ -1,95 +1,94 @@
-# OmongIn 📝  
+# OmongIn (Anonboard)
 
 ![Laravel](https://img.shields.io/badge/Laravel-12-red?logo=laravel)  
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-blue?logo=tailwindcss)  
 ![License](https://img.shields.io/badge/license-MIT-green)  
 
-**OmongIn** is a simple anonymous discussion platform built with **Laravel 12 + TailwindCSS**.  
-Users can create threads, post comments, and reply without revealing their real identity.  
+**OmongIn** is a professional anonymous discussion platform built with **Laravel 12** and **TailwindCSS**. It provides a secure and intuitive environment for users to create threads, post comments, and engage in discussions without disclosing their personal identity.
 
 ---
 
-## ✨ Features
+## Features
 
-**Core Features**
-- 🔐 **Authentication:** Register, login, and profile management (`/profile`).
-- 🗂️ **Boards & Threads:** Create custom boards and start discussions.
-- 💬 **Nested Comments:** Reply to threads and other comments with threaded views.
-- 🎭 **Anonymous Sessions:** Middleware tracking allows anonymous users to post and vote without an account.
-- ✏️ **Edit & Delete:** Modify or remove your own posts/comments (editing is limited to 15 minutes).
+### Core Functionality
+- **Authentication:** Integrated registration, login, and comprehensive profile management.
+- **Board & Thread Management:** Support for creating custom boards and initiating focused discussions.
+- **Nested Commenting Systems:** Threaded views for replies to ensure clear and organized conversations.
+- **Anonymous Session Tracking:** Advanced middleware allows non-registered users to interact with the platform while maintaining session integrity.
+- **Content Persistence:** Users can modify or remove their own posts and comments within a defined time limit.
 
-**Interaction & Moderation**
-- ⬆️ **Voting System:** Upvote and downvote threads or comments.
-- 📈 **Popular Threads:** Trending page (`/popular`) showcasing the most interactive discussions.
-- 🚩 **Reporting System:** Report problematic content (Spam, Abuse, NSFW, etc.).
-- 🔍 **Search & Filters:** Global search functionality and advanced sorting (Newest, Oldest, Top, Hot).
-- 🙈 **Spoilers & NSFW Tags:** "Click to reveal" protection for sensitive text and images.
+### Interaction & Moderation
+- **Voting System:** Robust upvote and downvote mechanism for both threads and comments.
+- **Trending Metrics:** A dedicated popular threads page highlighting high-engagement discussions.
+- **Content Reporting:** Integrated reporting system for moderating spam, abuse, and sensitive content.
+- **Advanced Discovery:** Global search functionality combined with granular filtering options (Newest, Top, Hot).
+- **Sensitive Content Management:** Built-in protection for spoilers and NSFW tags with click-to-reveal functionality.
 
-**UI/UX**
-- 🌗 **Monochrome Design:** Clean, modern monochrome aesthetic with **Dark Mode** & **Light Mode** toggle.
-- 📱 **Responsive:** Fully responsive design using TailwindCSS, featuring an Inter font typography.
-- 📎 **Media Uploads:** Support for image attachments with spoiler/NSFW blurring capabilities.
-
----
-
-## 🛠️ Tech Stack
-- [Laravel 12](https://laravel.com/) (PHP Framework)  
-- [MySQL](https://www.mysql.com/) (Database)  
-- [TailwindCSS](https://tailwindcss.com/) (UI Styling)  
-- [Alpine.js](https://alpinejs.dev/) (Lightweight Interactivity)  
+### User Experience
+- **Modern Aesthetic:** A clean, monochrome design language that supports both dark and light modes.
+- **Responsive Architecture:** Fully optimized for various screen sizes using TailwindCSS and the Inter type system.
+- **Media Support:** Capability to attach images with automatic blurring for sensitive content.
 
 ---
 
-## ⚙️ Installation
-1. Clone the repository
+## Technical Stack
+- **Framework:** Laravel 12 (PHP)
+- **Database:** MySQL
+- **Styles:** TailwindCSS
+- **Interactivity:** Alpine.js
+
+---
+
+## Installation
+
+Follow these steps to set up the development environment:
+
+1. **Clone the repository**
    ```bash
    git clone https://github.com/Oqexip/Anonboard.git
    cd Anonboard
-````
+   ```
 
-2. Install dependencies
-
+2. **Install dependencies**
    ```bash
    composer install
    npm install && npm run build
    ```
 
-3. Create `.env` file and configure your database
-
+3. **Configure environment**
    ```bash
    cp .env.example .env
    php artisan key:generate
    ```
 
-4. Run migrations & seeders
-
+4. **Initialize database**
    ```bash
    php artisan migrate --seed
    ```
 
-5. Start the development server
-
+5. **Start server**
    ```bash
    php artisan serve
    ```
----
-
-## 🤝 Contribution
-
-Contributions are welcome!
-
-1. Fork this repository
-2. Create a new branch (`git checkout -b feature-name`)
-3. Commit your changes (`git commit -m "Add new feature"`)
-4. Push to your branch (`git push origin feature-name`)
-5. Open a Pull Request
 
 ---
 
-## 📄 License
+## Contribution
+
+We welcome contributions to the project. Please follow the standard GitHub workflow:
+
+1. Fork the repository.
+2. Create a dedicated feature branch (`git checkout -b feature-name`).
+3. Commit your changes with descriptive messages (`git commit -m "Brief description of changes"`).
+4. Push to your branch (`git push origin feature-name`).
+5. Open a Pull Request for review.
+
+---
+
+## License
 
 This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-💡 Built by Oqexip as a learning & sharing project.
+Developed by Oqexip as an open-source platform for learning and collaboration.
